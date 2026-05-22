@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AssignMate — Monash Assignment Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#2d6a4f;--g2:#40916c;--g3:#52b788;--g4:#74c69d;--g5:#b7e4c7;--g6:#d8f3dc;--g7:#f0faf2;
+  --amber:#e8a838;--amber-l:#fff8e8;
+  --coral:#e05c4b;--coral-l:#fef0ee;
+  --lav:#7c6fbd;--lav-l:#f0eef9;
+  --ink:#1a2e1e;--ink-mid:#3d5a45;--ink-light:#7a9a82;
+  --card:#ffffff;--surface:#f4faf6;--border:rgba(45,106,79,0.12);
+  --shadow:0 4px 24px rgba(45,106,79,0.10);
+  --shadow-lg:0 8px 40px rgba(45,106,79,0.15);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;font-size:14px;line-height:1.6;overflow-x:hidden}
+
+/* ── NAV ── */
+.nav{background:var(--g1);padding:0 32px;display:flex;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(26,46,30,0.3)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#fff;padding:16px 0;margin-right:32px;letter-spacing:-0.5px;flex-shrink:0;display:flex;align-items:center;gap:8px}
+.nav-logo-leaf{display:inline-block;font-size:22px}
+.nav-logo span{color:#a8edbb}
+.nav-tabs{display:flex;align-items:center;flex:1;overflow-x:auto;gap:0}
+.nav-tab{padding:16px 16px;font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
+.nav-tab.active{color:#fff;border-bottom-color:#a8edbb}
+.nav-tab:hover:not(.active){color:rgba(255,255,255,0.85)}
+
+/* ── PAGES ── */
+.page{display:none;padding:28px 32px;max-width:1120px;margin:0 auto}
+.page.active{display:block}
+
+/* ── HERO STRIP ── */
+.hero-strip{background:linear-gradient(135deg,var(--g1) 0%,var(--g2) 60%,var(--g3) 100%);border-radius:20px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;gap:24px;overflow:hidden;position:relative}
+.hero-strip::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:rgba(255,255,255,0.06);border-radius:50%}
+.hero-text h1{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:6px}
+.hero-text p{font-size:13px;color:rgba(255,255,255,0.75);max-width:420px;line-height:1.6}
+.hero-illus{margin-left:auto;flex-shrink:0;position:relative;z-index:1}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.card-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* ── STAT CARDS ── */
+.stat-card{padding:18px 20px;display:flex;align-items:center;gap:16px;border-radius:16px}
+.stat-icon-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px}
+.stat-big{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;line-height:1;margin-bottom:4px}
+.stat-label{font-size:12px;color:var(--ink-light)}
+
+/* ── BADGE ── */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;line-height:1.4}
+.badge-high{background:var(--coral-l);color:var(--coral)}
+.badge-med{background:var(--amber-l);color:var(--amber)}
+.badge-low{background:var(--g6);color:var(--g1)}
+.badge-info{background:var(--lav-l);color:var(--lav)}
+.badge-dark{background:var(--ink);color:#fff}
+
+/* ── ALERTS ── */
+.alert-box{border-radius:12px;padding:13px 15px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;font-size:13px}
+.alert-box:last-child{margin-bottom:0}
+.alert-danger{background:var(--coral-l);border:0.5px solid rgba(224,92,75,0.2);color:var(--coral)}
+.alert-warning{background:var(--amber-l);border:0.5px solid rgba(232,168,56,0.2);color:var(--amber)}
+.alert-success{background:var(--g6);border:0.5px solid rgba(82,183,136,0.25);color:var(--g1)}
+.alert-info{background:var(--lav-l);border:0.5px solid rgba(124,111,189,0.2);color:var(--lav)}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.alert-text strong{display:block;font-weight:500;margin-bottom:2px;color:inherit;font-size:13px}
+.alert-text span{font-size:12px;opacity:.85;line-height:1.5}
+
+/* ── ASSIGNMENT ROWS ── */
+.assignment-row{display:flex;align-items:center;gap:12px;padding:11px 8px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .1s;border-radius:8px;margin:0 -8px}
+.assignment-row:last-child{border-bottom:none}
+.assignment-row:hover{background:var(--g7)}
+.assignment-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot-high{background:var(--coral)}.dot-med{background:var(--amber)}.dot-low{background:var(--g3)}.dot-info{background:var(--lav)}
+.assignment-info{flex:1;min-width:0}
+.assignment-name{font-weight:500;color:var(--ink);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.assignment-meta{font-size:11px;color:var(--ink-light);margin-top:2px}
+
+/* ── WEEK BAR ── */
+.week-bar-wrap{margin-bottom:10px}
+.week-label{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-mid);margin-bottom:5px}
+.week-bar-bg{height:10px;background:var(--g6);border-radius:5px;overflow:hidden}
+.week-bar-fill{height:100%;border-radius:5px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+/* ── HEATMAP ── */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.week-cell{height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--ink-mid);background:var(--g6);transition:transform .1s;cursor:default}
+.week-cell:hover{transform:scale(1.05)}
+.week-cell.danger{background:#fde4e0;color:var(--coral)}
+.week-cell.warning{background:var(--amber-l);color:var(--amber)}
+.week-cell.break{background:var(--lav-l);color:var(--lav)}
+.week-cell.exam{background:#fff0e0;color:#a06010}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:14px}
+label{font-size:12px;color:var(--ink-mid);display:block;margin-bottom:5px;font-weight:500;letter-spacing:.2px}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:9px 12px;border:0.5px solid rgba(45,106,79,0.25);border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--ink);transition:border-color .15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(82,183,136,0.1)}
+input[type=range]{width:100%;accent-color:var(--g2);cursor:pointer}
+textarea{resize:vertical;min-height:80px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── CHIPS ── */
+.chip-group{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{padding:5px 12px;border-radius:20px;font-size:12px;border:0.5px solid rgba(45,106,79,0.25);cursor:pointer;transition:all .15s;color:var(--ink-mid);background:#fff;user-select:none}
+.chip:hover{border-color:var(--g3);color:var(--g1)}
+.chip.selected{background:var(--g2);color:#fff;border-color:var(--g2)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .15s;border:none;text-decoration:none}
+.btn-primary{background:var(--g1);color:#fff}
+.btn-primary:hover{background:var(--g2);transform:translateY(-1px);box-shadow:var(--shadow)}
+.btn-secondary{background:var(--surface);color:var(--ink);border:0.5px solid var(--border)}
+.btn-secondary:hover{background:var(--g6)}
+
+/* ── CALENDAR ── */
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+.cal-day-label{text-align:center;font-size:10px;color:var(--ink-light);padding:4px 0;font-weight:500}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day{aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;cursor:pointer;transition:background .15s;position:relative}
+.cal-day:hover:not(.empty){background:var(--g6)}
+.cal-day.today{background:var(--g2);color:#fff}
+.cal-day.has-task::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--coral)}
+.cal-day.today.has-task::after{background:#a8edbb}
+.cal-day.other-month{color:var(--ink-light)}
+.cal-day.break-day{background:var(--lav-l);border-radius:0}
+.cal-day.holiday{color:var(--g2);font-weight:700}
+
+/* ── ESTIMATOR RESULT ── */
+.estimator-result{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-radius:14px;padding:20px}
+.est-num{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;line-height:1}
+.est-unit{font-size:14px;opacity:.6;margin-bottom:20px;margin-top:4px}
+.est-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.12)}
+.est-row:last-child{border-bottom:none}
+.est-row .est-key{opacity:.6}
+.est-row .est-val{font-weight:500}
+
+/* ── MONASH BANNER ── */
+.monash-banner{background:linear-gradient(135deg,var(--g1) 0%,var(--g2) 100%);border-radius:16px;padding:18px 22px;display:flex;align-items:center;gap:16px;margin-bottom:24px;overflow:hidden;position:relative}
+.monash-banner::before{content:'🎓';position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:56px;opacity:.12}
+.monash-icon{font-size:28px;color:#a8edbb;flex-shrink:0}
+.monash-info{flex:1}
+.monash-title{color:#a8edbb;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px}
+.monash-dates{display:flex;flex-wrap:wrap;gap:6px}
+.monash-pill{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:3px 9px;border-radius:6px;font-size:11px}
+.monash-pill.urgent{background:rgba(224,92,75,0.3);color:#ffb3a8}
+.monash-pill.good{background:rgba(168,237,187,0.2);color:#a8edbb}
+
+/* ── FEATURE CARDS (home grid) ── */
+.feature-card{border-radius:16px;padding:20px;overflow:hidden;position:relative;cursor:pointer;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column;gap:8px;min-height:140px}
+.feature-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.feature-card.green{background:linear-gradient(135deg,var(--g5) 0%,var(--g6) 100%);border:0.5px solid rgba(82,183,136,0.3)}
+.feature-card.warm{background:linear-gradient(135deg,#fff8e8 0%,#fff3d6 100%);border:0.5px solid rgba(232,168,56,0.2)}
+.feature-card.coral{background:linear-gradient(135deg,#fef0ee 0%,#fde4e0 100%);border:0.5px solid rgba(224,92,75,0.15)}
+.feature-card.lav{background:linear-gradient(135deg,#f0eef9 0%,#e8e5f5 100%);border:0.5px solid rgba(124,111,189,0.2)}
+.feature-card-illus{position:absolute;right:-8px;bottom:-8px;opacity:.9}
+.feature-card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--ink)}
+.feature-card-sub{font-size:12px;color:var(--ink-light);line-height:1.5;max-width:65%}
+
+/* ── PERSONA CARDS ── */
+.persona-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.persona-card{border-radius:14px;padding:18px;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s;border:1.5px solid var(--border);background:var(--card)}
+.persona-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.persona-card.active{border-color:var(--g2);background:var(--g7)}
+.persona-emoji{font-size:32px;margin-bottom:8px;display:block}
+.persona-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.persona-desc{font-size:11px;color:var(--ink-light);line-height:1.5}
+
+/* ── EVENT LIST ── */
+.event-list{list-style:none}
+.event-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.event-item:last-child{border-bottom:none}
+.event-date-wrap{text-align:center;min-width:28px}
+.event-date{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink-mid);line-height:1}
+.event-month{font-size:10px;color:var(--ink-light)}
+.event-info{flex:1}
+.event-name{font-weight:500;font-size:13px;color:var(--ink)}
+.section-divider{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
+.divider{border:none;border-top:0.5px solid var(--border);margin:16px 0}
+.text-muted{color:var(--ink-light);font-size:12px}
+.delete-btn{background:none;border:none;color:var(--ink-light);cursor:pointer;font-size:16px;padding:4px;border-radius:4px;transition:color .15s,background .15s;flex-shrink:0}
+.delete-btn:hover{color:var(--coral);background:var(--coral-l)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--ink-light)}
+.empty-state i{font-size:40px;display:block;margin-bottom:12px;opacity:.4}
+.progress-wrap{background:var(--g6);border-radius:4px;height:6px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;background:var(--g3);transition:width .6s}
+.progress-fill.danger{background:var(--coral)}
+.progress-fill.warning{background:var(--amber)}
+
+@media(max-width:700px){
+  .page{padding:16px}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .persona-grid{grid-template-columns:1fr 1fr}
+  .nav{padding:0 16px}
+  .form-row-2{grid-template-columns:1fr}
+}
+
+/* ── ILLUSTRATION SVGS (inline, no external deps) ── */
+.illus-student,.illus-calendar,.illus-burnout,.illus-timer,.illus-persona{display:block}
+</style>
+</head>
+<body>
+
+<nav class="nav" role="navigation">
+  <div class="nav-logo">
+    <span class="nav-logo-leaf">🌿</span>Assign<span>Mate</span>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showPage('dashboard',this)"><i class="ti ti-home"></i> Dashboard</div>
+    <div class="nav-tab" onclick="showPage('add',this)"><i class="ti ti-plus"></i> Add Assignment</div>
+    <div class="nav-tab" onclick="showPage('calendar',this)"><i class="ti ti-calendar"></i> Calendar</div>
+    <div class="nav-tab" onclick="showPage('predict',this)"><i class="ti ti-flame"></i> Burnout Predict</div>
+    <div class="nav-tab" onclick="showPage('estimator',this)"><i class="ti ti-clock"></i> Time Estimator</div>
+    <div class="nav-tab" onclick="showPage('persona',this)"><i class="ti ti-mood-smile"></i> Study Persona</div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<div id="dashboard" class="page active">
+
+  <div class="monash-banner">
+    <i class="ti ti-school monash-icon"></i>
+    <div class="monash-info">
+      <div class="monash-title">Monash University 2026 · Semester 1</div>
+      <div class="monash-dates">
+        <span class="monash-pill good">Week 12 of 12</span>
+        <span class="monash-pill urgent">Swot Vac: Jun 1–5</span>
+        <span class="monash-pill urgent">Exams: Jun 8–27</span>
+        <span class="monash-pill">Census: Mar 31 ✓</span>
+        <span class="monash-pill">ANZAC Day: Apr 25 ✓</span>
+        <span class="monash-pill">Mid-Sem: Apr 6–10 ✓</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero-strip" style="margin-bottom:24px">
+    <div class="hero-text">
+      <h1 id="hero-greeting">Good morning, student 👋</h1>
+      <p id="hero-sub">Track your Monash assignments, predict burnout before it hits, and actually finish on time.</p>
+    </div>
+    <div class="hero-illus">
+      <!-- Student at desk illustration -->
+      <svg width="160" height="120" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Desk -->
+        <rect x="20" y="90" width="120" height="8" rx="4" fill="rgba(255,255,255,0.25)"/>
+        <rect x="30" y="98" width="8" height="18" rx="4" fill="rgba(255,255,255,0.2)"/>
+        <rect x="122" y="98" width="8" height="18" rx="4" fill="rgba(255,255,255,0.2)"/>
+        <!-- Monitor -->
+        <rect x="55" y="58" width="50" height="34" rx="5" fill="rgba(255,255,255,0.3)"/>
+        <rect x="58" y="61" width="44" height="26" rx="3" fill="rgba(168,237,187,0.5)"/>
+        <!-- Screen lines (assignments) -->
+        <rect x="62" y="66" width="20" height="3" rx="1.5" fill="rgba(255,255,255,0.8)"/>
+        <rect x="62" y="72" width="28" height="3" rx="1.5" fill="rgba(255,255,255,0.6)"/>
+        <rect x="62" y="78" width="16" height="3" rx="1.5" fill="rgba(255,255,255,0.5)"/>
+        <!-- Checkmark -->
+        <circle cx="90" cy="68" r="4" fill="rgba(168,237,187,0.9)"/>
+        <path d="M87.5 68l1.5 1.5 3-3" stroke="#2d6a4f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Monitor stand -->
+        <rect x="77" y="92" width="6" height="6" rx="1" fill="rgba(255,255,255,0.2)"/>
+        <rect x="68" y="97" width="24" height="3" rx="1.5" fill="rgba(255,255,255,0.2)"/>
+        <!-- Person body -->
+        <ellipse cx="38" cy="70" rx="14" ry="18" fill="rgba(255,255,255,0.2)"/>
+        <!-- Person head -->
+        <circle cx="38" cy="50" r="11" fill="rgba(255,255,255,0.3)"/>
+        <!-- Hair -->
+        <path d="M27 47 Q38 38 49 47" fill="rgba(45,106,79,0.5)"/>
+        <!-- Face details -->
+        <circle cx="34" cy="50" r="1.5" fill="rgba(255,255,255,0.6)"/>
+        <circle cx="42" cy="50" r="1.5" fill="rgba(255,255,255,0.6)"/>
+        <path d="M34 55 Q38 58 42 55" stroke="rgba(255,255,255,0.5)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <!-- Arm to keyboard -->
+        <path d="M48 72 Q58 78 65 86" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>
+        <!-- Keyboard -->
+        <rect x="40" y="85" width="30" height="8" rx="3" fill="rgba(255,255,255,0.2)"/>
+        <!-- Coffee cup -->
+        <rect x="115" y="75" width="14" height="16" rx="3" fill="rgba(255,255,255,0.25)"/>
+        <path d="M129 82 Q136 82 136 87 Q136 92 129 92" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/>
+        <!-- Steam -->
+        <path d="M119 73 Q121 68 119 63" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M123 73 Q125 67 123 62" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Book -->
+        <rect x="18" y="82" width="22" height="10" rx="2" fill="rgba(255,255,255,0.2)"/>
+        <line x1="29" y1="82" x2="29" y2="92" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <!-- Floating stars/sparkles -->
+        <text x="140" y="30" font-size="14" fill="rgba(255,255,255,0.5)">✦</text>
+        <text x="10" y="35" font-size="10" fill="rgba(255,255,255,0.4)">✦</text>
+        <text x="130" y="55" font-size="8" fill="rgba(168,237,187,0.6)">★</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid-4" style="margin-bottom:20px">
+    <div class="card stat-card" style="background:linear-gradient(135deg,#fef0ee,#fde4e0)">
+      <div class="stat-icon-wrap" style="background:rgba(224,92,75,0.15)">
+        <span style="font-size:22px">📅</span>
+      </div>
+      <div>
+        <div class="stat-big" id="stat-due" style="color:var(--coral)">—</div>
+        <div class="stat-label">Due this week</div>
+      </div>
+    </div>
+    <div class="card stat-card" style="background:linear-gradient(135deg,#fff8e8,#fff3d6)">
+      <div class="stat-icon-wrap" style="background:rgba(232,168,56,0.15)">
+        <span style="font-size:22px">⏱️</span>
+      </div>
+      <div>
+        <div class="stat-big" id="stat-hours" style="color:var(--amber)">—</div>
+        <div class="stat-label">Hours remaining</div>
+      </div>
+    </div>
+    <div class="card stat-card" style="background:linear-gradient(135deg,var(--g6),var(--g5))">
+      <div class="stat-icon-wrap" style="background:rgba(82,183,136,0.2)">
+        <span style="font-size:22px">📚</span>
+      </div>
+      <div>
+        <div class="stat-big" id="stat-total" style="color:var(--g2)">—</div>
+        <div class="stat-label">Total assignments</div>
+      </div>
+    </div>
+    <div class="card stat-card" style="background:linear-gradient(135deg,var(--lav-l),#e8e5f5)">
+      <div class="stat-icon-wrap" style="background:rgba(124,111,189,0.15)">
+        <span style="font-size:22px">✅</span>
+      </div>
+      <div>
+        <div class="stat-big" id="stat-done" style="color:var(--lav)">—</div>
+        <div class="stat-label">Completed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURE CARDS -->
+  <div class="grid-4" style="margin-bottom:20px">
+    <div class="feature-card green" onclick="showPage('add',null)">
+      <div class="feature-card-title">Add Assignment</div>
+      <div class="feature-card-sub">14 types, Monash integration</div>
+      <div class="feature-card-illus">
+        <svg width="70" height="70" viewBox="0 0 70 70"><circle cx="40" cy="40" r="28" fill="rgba(82,183,136,0.2)"/><text x="18" y="50" font-size="30">📝</text></svg>
+      </div>
+    </div>
+    <div class="feature-card warm" onclick="showPage('predict',null)">
+      <div class="feature-card-title">Burnout Predict</div>
+      <div class="feature-card-sub">Week-by-week risk forecast</div>
+      <div class="feature-card-illus">
+        <svg width="70" height="70" viewBox="0 0 70 70"><circle cx="40" cy="40" r="28" fill="rgba(232,168,56,0.2)"/><text x="18" y="50" font-size="30">🔥</text></svg>
+      </div>
+    </div>
+    <div class="feature-card coral" onclick="showPage('estimator',null)">
+      <div class="feature-card-title">Time Estimator</div>
+      <div class="feature-card-sub">Realistic hours, not optimism</div>
+      <div class="feature-card-illus">
+        <svg width="70" height="70" viewBox="0 0 70 70"><circle cx="40" cy="40" r="28" fill="rgba(224,92,75,0.15)"/><text x="18" y="50" font-size="30">⏰</text></svg>
+      </div>
+    </div>
+    <div class="feature-card lav" onclick="showPage('persona',null)">
+      <div class="feature-card-title">Study Persona</div>
+      <div class="feature-card-sub">Your academic MBTI</div>
+      <div class="feature-card-illus">
+        <svg width="70" height="70" viewBox="0 0 70 70"><circle cx="40" cy="40" r="28" fill="rgba(124,111,189,0.15)"/><text x="18" y="50" font-size="30">🧬</text></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title">Upcoming deadlines</div>
+      <div id="upcoming-list">
+        <div class="empty-state"><i class="ti ti-clipboard-list"></i><p>No assignments yet. Add your first one!</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Semester 1 — workload heatmap</div>
+      <div id="heatmap-grid" style="margin-bottom:12px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="badge badge-high" style="font-size:10px">High Risk</span>
+        <span class="badge badge-med" style="font-size:10px">Moderate</span>
+        <span class="badge badge-low" style="font-size:10px">Light</span>
+        <span class="badge badge-info" style="font-size:10px">Break / Exam</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Active alerts</div>
+    <div id="alerts-list"></div>
+  </div>
+</div>
+
+<!-- ══════════ ADD ASSIGNMENT ══════════ -->
+<div id="add" class="page">
+  <!-- Illustration header -->
+  <div style="background:linear-gradient(135deg,var(--g6) 0%,var(--g5) 100%);border-radius:20px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;overflow:hidden;position:relative">
+    <div style="position:absolute;right:-10px;top:-10px;opacity:.15;font-size:100px">📋</div>
+    <svg width="100" height="90" viewBox="0 0 100 90" style="flex-shrink:0">
+      <!-- Clipboard base -->
+      <rect x="15" y="20" width="70" height="62" rx="8" fill="white" opacity=".9"/>
+      <rect x="35" y="14" width="30" height="14" rx="4" fill="var(--g3)"/>
+      <!-- Lines -->
+      <rect x="25" y="38" width="50" height="3" rx="1.5" fill="var(--g5)"/>
+      <rect x="25" y="48" width="38" height="3" rx="1.5" fill="var(--g5)"/>
+      <rect x="25" y="58" width="44" height="3" rx="1.5" fill="var(--g5)"/>
+      <rect x="25" y="68" width="30" height="3" rx="1.5" fill="var(--g5)"/>
+      <!-- Checkboxes -->
+      <rect x="25" y="36" width="8" height="8" rx="2" fill="var(--g3)"/>
+      <path d="M26.5 40l2 2 4-4" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="25" y="46" width="8" height="8" rx="2" fill="var(--g4)"/>
+      <path d="M26.5 50l2 2 4-4" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="25" y="56" width="8" height="8" rx="2" fill="var(--g5)" stroke="var(--g3)" stroke-width="1"/>
+      <!-- Pencil -->
+      <rect x="72" y="50" width="6" height="26" rx="2" fill="var(--amber)" transform="rotate(-35 72 50)"/>
+      <polygon points="69,72 75,68 72,76" fill="var(--ink)" transform="rotate(-35 72 50)" opacity=".5"/>
+    </svg>
+    <div>
+      <h1 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--g1);margin-bottom:4px">Add New Assignment</h1>
+      <p style="font-size:13px;color:var(--ink-light)">Fill in the details — AssignMate will predict your workload impact and recommend a start date.</p>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Assignment details</div>
+      <div class="form-group">
+        <label>Unit code &amp; name</label>
+        <input type="text" id="unit-name" placeholder="e.g. FIT3155 Advanced Algorithms">
+      </div>
+
+      <div class="section-divider">Assignment type</div>
+      <div class="chip-group" id="type-chips">
+        <div class="chip" data-type="Essay" onclick="toggleSingle(this,'type-chips')">Essay</div>
+        <div class="chip" data-type="Report" onclick="toggleSingle(this,'type-chips')">Report</div>
+        <div class="chip" data-type="Coding Project" onclick="toggleSingle(this,'type-chips')">Coding Project</div>
+        <div class="chip" data-type="Design Project" onclick="toggleSingle(this,'type-chips')">Design Project</div>
+        <div class="chip" data-type="Video" onclick="toggleSingle(this,'type-chips')">Video</div>
+        <div class="chip" data-type="Presentation" onclick="toggleSingle(this,'type-chips')">Presentation</div>
+        <div class="chip" data-type="Lab Report" onclick="toggleSingle(this,'type-chips')">Lab Report</div>
+        <div class="chip" data-type="Case Study" onclick="toggleSingle(this,'type-chips')">Case Study</div>
+        <div class="chip" data-type="Literature Review" onclick="toggleSingle(this,'type-chips')">Literature Review</div>
+        <div class="chip" data-type="Online Quiz" onclick="toggleSingle(this,'type-chips')">Online Quiz / Test</div>
+        <div class="chip" data-type="Reflection" onclick="toggleSingle(this,'type-chips')">Reflection Journal</div>
+        <div class="chip" data-type="Portfolio" onclick="toggleSingle(this,'type-chips')">Portfolio</div>
+        <div class="chip" data-type="Exam" onclick="toggleSingle(this,'type-chips')">Take-Home Exam</div>
+        <div class="chip" data-type="Data Analysis" onclick="toggleSingle(this,'type-chips')">Data Analysis</div>
+      </div>
+
+      <div class="section-divider">Collaboration mode</div>
+      <div class="chip-group" id="collab-chips">
+        <div class="chip selected" onclick="toggleSingle(this,'collab-chips')">Individual</div>
+        <div class="chip" onclick="toggleSingle(this,'collab-chips')">Group (2–3 people)</div>
+        <div class="chip" onclick="toggleSingle(this,'collab-chips')">Group (4+ people)</div>
+        <div class="chip" onclick="toggleSingle(this,'collab-chips')">Pair (partner work)</div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group"><label>Due date</label><input type="date" id="due-date"></div>
+        <div class="form-group"><label>Weighting (%)</label><input type="number" id="weighting" placeholder="e.g. 30" min="1" max="100"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Word count / length</label><input type="number" id="word-count" placeholder="e.g. 2500"></div>
+        <div class="form-group">
+          <label>Subject difficulty</label>
+          <select id="difficulty">
+            <option value="0.8">Easy (WAM booster)</option>
+            <option value="1.0" selected>Moderate</option>
+            <option value="1.4">Hard (first attempt)</option>
+            <option value="1.8">Very Hard (grad-level)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Notes / brief requirements</label><textarea id="notes" placeholder="Assignment brief, special requirements, group member names…"></textarea></div>
+      <button class="btn btn-primary" onclick="addAssignment()" style="width:100%"><i class="ti ti-plus"></i> Add &amp; Predict Impact</button>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">Impact prediction</div>
+        <div id="impact-preview">
+          <div class="empty-state" style="padding:24px">
+            <!-- Illustration -->
+            <svg width="80" height="80" viewBox="0 0 80 80" style="margin:0 auto 12px">
+              <circle cx="40" cy="40" r="36" fill="var(--g6)"/>
+              <text x="18" y="54" font-size="38">🔍</text>
+            </svg>
+            <p>Fill in assignment details to see predicted workload impact and recommended start date.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">All assignments</div>
+        <div id="all-assignments-list"><p class="text-muted" style="padding:12px 0">No assignments added yet.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CALENDAR ══════════ -->
+<div id="calendar" class="page">
+  <div style="background:linear-gradient(135deg,var(--lav-l),#e8e5f5);border-radius:20px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden">
+    <div style="position:absolute;right:-10px;top:-10px;opacity:.12;font-size:100px">📆</div>
+    <svg width="100" height="90" viewBox="0 0 100 90" style="flex-shrink:0">
+      <!-- Calendar body -->
+      <rect x="10" y="18" width="80" height="66" rx="10" fill="white" opacity=".9"/>
+      <rect x="10" y="18" width="80" height="22" rx="10" fill="var(--lav)"/>
+      <rect x="10" y="30" width="80" height="10" rx="0" fill="var(--lav)"/>
+      <!-- Ring clips -->
+      <rect x="28" y="12" width="8" height="16" rx="4" fill="var(--lav)"/>
+      <rect x="64" y="12" width="8" height="16" rx="4" fill="var(--lav)"/>
+      <!-- Day grid -->
+      <rect x="18" y="48" width="9" height="9" rx="2" fill="var(--g5)"/>
+      <rect x="31" y="48" width="9" height="9" rx="2" fill="var(--g5)"/>
+      <circle cx="49" cy="52.5" r="5" fill="var(--g3)"/>
+      <text x="46.5" y="56" font-size="6" fill="white" font-weight="bold">20</text>
+      <rect x="58" y="48" width="9" height="9" rx="2" fill="var(--g5)"/>
+      <rect x="71" y="48" width="9" height="9" rx="2" fill="var(--coral-l)" stroke="var(--coral)" stroke-width=".8"/>
+      <rect x="18" y="62" width="9" height="9" rx="2" fill="var(--g5)"/>
+      <rect x="31" y="62" width="9" height="9" rx="2" fill="var(--g5)"/>
+      <rect x="44" y="62" width="9" height="9" rx="2" fill="var(--amber-l)" stroke="var(--amber)" stroke-width=".8"/>
+      <rect x="58" y="62" width="9" height="9" rx="2" fill="var(--g5)"/>
+      <rect x="71" y="62" width="9" height="9" rx="2" fill="var(--g5)"/>
+      <!-- Stars -->
+      <text x="78" y="20" font-size="8" fill="rgba(255,255,255,0.7)">✦</text>
+    </svg>
+    <div>
+      <h1 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--lav);margin-bottom:4px">Academic Calendar</h1>
+      <p style="font-size:13px;color:var(--ink-light)">Monash University 2026 — your assignments overlaid on official semester dates.</p>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0" id="cal-month-label">May 2026</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-secondary" style="padding:6px 10px" onclick="changeMonth(-1)"><i class="ti ti-chevron-left"></i></button>
+          <button class="btn btn-secondary" style="padding:6px 10px" onclick="changeMonth(1)"><i class="ti ti-chevron-right"></i></button>
+        </div>
+      </div>
+      <div class="cal-header">
+        <div class="cal-day-label">Mon</div><div class="cal-day-label">Tue</div><div class="cal-day-label">Wed</div>
+        <div class="cal-day-label">Thu</div><div class="cal-day-label">Fri</div><div class="cal-day-label">Sat</div><div class="cal-day-label">Sun</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Monash 2026 key dates</div>
+      <ul class="event-list" id="key-dates-list"></ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Semester legend</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px"><div style="width:20px;height:20px;border-radius:50%;background:var(--g2);flex-shrink:0"></div>Today</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px"><div style="width:20px;height:20px;border-radius:4px;background:var(--coral-l);border:1.5px solid var(--coral);flex-shrink:0"></div>Assignment due</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px"><div style="width:20px;height:20px;border-radius:4px;background:var(--lav-l);flex-shrink:0"></div>Break / holiday</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px"><div style="width:20px;height:20px;border-radius:4px;background:#fff0e0;flex-shrink:0"></div>Exam period</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ BURNOUT PREDICT ══════════ -->
+<div id="predict" class="page">
+  <div style="background:linear-gradient(135deg,#fff8e8,#fff3d6);border-radius:20px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden">
+    <div style="position:absolute;right:20px;top:50%;transform:translateY(-50%);opacity:.9">
+      <!-- Burnout / stress illustration -->
+      <svg width="130" height="110" viewBox="0 0 130 110">
+        <!-- Brain with stress waves -->
+        <ellipse cx="65" cy="65" rx="40" ry="35" fill="var(--amber-l)" stroke="var(--amber)" stroke-width="1.5"/>
+        <path d="M42 58 Q50 45 58 55 Q66 65 74 55 Q82 45 88 58" stroke="var(--amber)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M42 68 Q50 80 58 70 Q66 60 74 70 Q82 80 88 68" stroke="var(--amber)" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
+        <!-- Flame on top -->
+        <path d="M60 35 Q58 25 65 20 Q68 28 72 25 Q75 18 65 12 Q80 18 78 30 Q72 22 70 30 Q75 35 65 40 Q55 35 60 35Z" fill="var(--coral)" opacity=".8"/>
+        <!-- Stress bolts -->
+        <text x="10" y="38" font-size="16" fill="var(--amber)" opacity=".7">⚡</text>
+        <text x="100" y="42" font-size="14" fill="var(--coral)" opacity=".7">⚡</text>
+        <text x="18" y="72" font-size="12" fill="var(--amber)" opacity=".5">💥</text>
+        <!-- Zz (sleep deprived) -->
+        <text x="95" y="30" font-size="10" fill="var(--ink-light)">z</text>
+        <text x="103" y="22" font-size="12" fill="var(--ink-light)">z</text>
+        <text x="113" y="14" font-size="14" fill="var(--ink-light)">z</text>
+        <!-- Bar chart preview -->
+        <rect x="20" y="95" width="8" height="12" rx="2" fill="var(--g3)" opacity=".7"/>
+        <rect x="32" y="88" width="8" height="19" rx="2" fill="var(--amber)" opacity=".7"/>
+        <rect x="44" y="80" width="8" height="27" rx="2" fill="var(--coral)" opacity=".8"/>
+        <rect x="56" y="90" width="8" height="17" rx="2" fill="var(--amber)" opacity=".7"/>
+        <rect x="68" y="85" width="8" height="22" rx="2" fill="var(--coral)" opacity=".8"/>
+        <rect x="80" y="78" width="8" height="29" rx="2" fill="var(--coral)" opacity=".9"/>
+        <rect x="92" y="92" width="8" height="15" rx="2" fill="var(--g3)" opacity=".7"/>
+      </svg>
+    </div>
+    <div>
+      <h1 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--amber);margin-bottom:4px">Assignment Stress Prediction</h1>
+      <p style="font-size:13px;color:var(--ink-light)">Automated workload analysis across your full 12-week Monash Semester 1, 2026.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Semester 1 workload forecast — 12 teaching weeks + swot vac</div>
+    <div id="week-bars-container"></div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title">High risk periods</div>
+      <div id="high-risk-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Recovery &amp; low-load windows</div>
+      <div id="recovery-list"></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title">Workload pattern insights</div><div id="insights-list"></div></div>
+</div>
+
+<!-- ══════════ TIME ESTIMATOR ══════════ -->
+<div id="estimator" class="page">
+  <div style="background:linear-gradient(135deg,var(--coral-l),#fde4e0);border-radius:20px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden">
+    <svg width="110" height="100" viewBox="0 0 110 100" style="flex-shrink:0">
+      <!-- Clock/timer illustration -->
+      <circle cx="55" cy="55" r="38" fill="white" opacity=".8"/>
+      <circle cx="55" cy="55" r="38" stroke="var(--coral)" stroke-width="2" fill="none"/>
+      <!-- Clock face details -->
+      <circle cx="55" cy="55" r="3" fill="var(--coral)"/>
+      <!-- Hour hand -->
+      <line x1="55" y1="55" x2="55" y2="28" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <!-- Minute hand -->
+      <line x1="55" y1="55" x2="72" y2="48" stroke="var(--coral)" stroke-width="2" stroke-linecap="round"/>
+      <!-- Tick marks -->
+      <line x1="55" y1="19" x2="55" y2="24" stroke="var(--ink-light)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="91" y1="55" x2="86" y2="55" stroke="var(--ink-light)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="55" y1="91" x2="55" y2="86" stroke="var(--ink-light)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="19" y1="55" x2="24" y2="55" stroke="var(--ink-light)" stroke-width="2" stroke-linecap="round"/>
+      <!-- Alarm top -->
+      <path d="M38 20 Q45 14 55 13 Q65 14 72 20" stroke="var(--coral)" stroke-width="2" fill="none" opacity=".5"/>
+      <circle cx="35" cy="22" r="4" fill="var(--coral)" opacity=".6"/>
+      <circle cx="75" cy="22" r="4" fill="var(--coral)" opacity=".6"/>
+      <!-- Panic zone arc -->
+      <path d="M55 55 L55 25" stroke="none"/>
+      <path d="M72 28 A30 30 0 0 1 88 65" stroke="var(--coral)" stroke-width="4" fill="none" opacity=".3" stroke-linecap="round"/>
+      <!-- Person running -->
+      <text x="2" y="85" font-size="28" opacity=".7">🏃</text>
+    </svg>
+    <div>
+      <h1 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--coral);margin-bottom:4px">Realistic Time Estimator</h1>
+      <p style="font-size:13px;color:var(--ink-light)">Based on your work style and procrastination patterns — not textbook optimism.</p>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Assignment parameters</div>
+      <div class="form-group"><label>Assignment type</label>
+        <select id="est-type" onchange="calcEstimate()">
+          <option>Essay</option><option>Report</option><option>Coding Project</option>
+          <option>Design Project</option><option>Video Production</option>
+          <option>Presentation</option><option>Lab Report</option>
+          <option>Case Study</option><option>Literature Review</option><option>Portfolio</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Word count (or equivalent scope)</label>
+        <input type="range" min="300" max="10000" step="100" value="2000" id="est-words" oninput="updateEstLabel('est-words','est-words-out',v=>Math.round(v).toLocaleString()+' words');calcEstimate()">
+        <div class="text-muted" id="est-words-out" style="margin-top:4px">2,000 words</div>
+      </div>
+      <div class="form-group"><label>Subject difficulty</label>
+        <select id="est-diff" onchange="calcEstimate()">
+          <option value="0.8">Easy (WAM booster, familiar content)</option>
+          <option value="1.0" selected>Moderate (typical unit)</option>
+          <option value="1.4">Hard (first attempt, unfamiliar area)</option>
+          <option value="1.8">Very Hard (grad-level, technical depth)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Your procrastination level</label>
+        <input type="range" min="1" max="5" step="1" value="3" id="est-procr" oninput="updateProcr();calcEstimate()">
+        <div class="text-muted" id="est-procr-out" style="margin-top:4px">Level 3 — I'll start after one more episode</div>
+      </div>
+      <div class="form-group">
+        <label>Available hours per day</label>
+        <input type="range" min="1" max="10" step="0.5" value="3" id="est-daily" oninput="updateEstLabel('est-daily','est-daily-out',v=>v+' hours/day');calcEstimate()">
+        <div class="text-muted" id="est-daily-out" style="margin-top:4px">3 hours/day</div>
+      </div>
+      <div class="form-group"><label>Due date</label><input type="date" id="est-due" onchange="calcEstimate()"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Your realistic estimate</div>
+      <div id="estimate-result">
+        <div class="empty-state">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="margin:0 auto 12px;display:block">
+            <circle cx="40" cy="40" r="36" fill="var(--coral-l)"/>
+            <text x="18" y="54" font-size="38">⏰</text>
+          </svg>
+          <p>Adjust the parameters to generate a personalised time estimate.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STUDY PERSONA ══════════ -->
+<div id="persona" class="page">
+  <div style="background:linear-gradient(135deg,var(--g6),var(--g5));border-radius:20px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;gap:24px;position:relative;overflow:hidden">
+    <!-- Multiple character illustration -->
+    <svg width="200" height="100" viewBox="0 0 200 100" style="flex-shrink:0">
+      <!-- Background blobs -->
+      <ellipse cx="100" cy="70" rx="90" ry="28" fill="rgba(82,183,136,0.2)"/>
+      <!-- Panic Worker (red) -->
+      <circle cx="25" cy="45" r="14" fill="#ffb3a8"/>
+      <path d="M11 65 Q25 55 39 65 L39 90 L11 90Z" fill="#fde4e0"/>
+      <text x="17" y="48" font-size="10" fill="white">😰</text>
+      <!-- Planner (purple) -->
+      <circle cx="60" cy="40" r="14" fill="#c4b8f0"/>
+      <path d="M46 60 Q60 50 74 60 L74 90 L46 90Z" fill="var(--lav-l)"/>
+      <text x="52" y="43" font-size="10" fill="white">📋</text>
+      <!-- Achiever (green center hero) -->
+      <circle cx="100" cy="35" r="18" fill="var(--g4)"/>
+      <path d="M82 58 Q100 46 118 58 L118 90 L82 90Z" fill="var(--g5)"/>
+      <text x="89" y="39" font-size="14" fill="white">🌿</text>
+      <!-- Perfectionist (amber) -->
+      <circle cx="140" cy="40" r="14" fill="#f5d06a"/>
+      <path d="M126 60 Q140 50 154 60 L154 90 L126 90Z" fill="var(--amber-l)"/>
+      <text x="132" y="43" font-size="10" fill="white">🔥</text>
+      <!-- Genius (dark) -->
+      <circle cx="175" cy="45" r="14" fill="#8aaa8a"/>
+      <path d="M161 65 Q175 55 189 65 L189 90 L161 90Z" fill="var(--g6)"/>
+      <text x="167" y="48" font-size="10" fill="white">⚡</text>
+      <!-- Stars -->
+      <text x="88" y="15" font-size="8" fill="var(--g2)" opacity=".8">★</text>
+      <text x="110" y="12" font-size="6" fill="var(--g2)" opacity=".6">★</text>
+    </svg>
+    <div>
+      <h1 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--g1);margin-bottom:4px">Your Study Personality</h1>
+      <p style="font-size:13px;color:var(--ink-light)">Which one are you? Your persona dynamically adjusts alerts, start dates, and recommendations. Auto-updates after 30 days of tracking.</p>
+    </div>
+  </div>
+
+  <div class="persona-grid" id="persona-grid"></div>
+  <div class="card" id="persona-advice">
+    <div class="card-title" id="advice-title">Select a persona above to see personalised recommendations</div>
+    <div id="advice-body"><p class="text-muted">AssignMate tailors your alerts, burnout thresholds, and weekly nudges based on your study personality.</p></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+/* ═══════════════ DATA ═══════════════ */
+const M26={
+  sem1Start:new Date('2026-03-02'),sem1End:new Date('2026-05-29'),
+  midBreak:{start:new Date('2026-04-06'),end:new Date('2026-04-10')},
+  swotVac:{start:new Date('2026-06-01'),end:new Date('2026-06-05')},
+  exams:{start:new Date('2026-06-08'),end:new Date('2026-06-27')},
+  sem2Start:new Date('2026-07-27'),sem2End:new Date('2026-10-23'),
+  sem2Mid:{start:new Date('2026-09-28'),end:new Date('2026-10-02')},
+  hols:[
+    {date:new Date('2026-01-01'),name:"New Year's Day"},
+    {date:new Date('2026-01-26'),name:"Australia Day"},
+    {date:new Date('2026-03-09'),name:"Labour Day (VIC)"},
+    {date:new Date('2026-04-03'),name:"Good Friday"},
+    {date:new Date('2026-04-06'),name:"Easter Monday"},
+    {date:new Date('2026-04-25'),name:"ANZAC Day"},
+    {date:new Date('2026-06-08'),name:"King's Birthday (VIC)"},
+    {date:new Date('2026-11-03'),name:"Melbourne Cup Day"},
+    {date:new Date('2026-12-25'),name:"Christmas Day"},
+    {date:new Date('2026-12-26'),name:"Boxing Day"},
+  ]
+};
+const KEY_DATES=[
+  {month:'Feb',day:23,name:'Semester 1 Orientation Week begins',type:'info'},
+  {month:'Mar',day:2,name:'Semester 1 Teaching Period begins',type:'good'},
+  {month:'Mar',day:31,name:'Census Date — last day to withdraw without penalty',type:'danger'},
+  {month:'Apr',day:3,name:'Good Friday — University closed',type:'break'},
+  {month:'Apr',day:6,name:'Mid-Semester Break + Easter Monday',type:'break'},
+  {month:'Apr',day:10,name:'Mid-Semester Break ends',type:'break'},
+  {month:'Apr',day:25,name:'ANZAC Day — University closed',type:'break'},
+  {month:'May',day:29,name:'Last day of Semester 1 teaching',type:'info'},
+  {month:'Jun',day:1,name:'Swot Vac begins — no new content',type:'warning'},
+  {month:'Jun',day:5,name:'Swot Vac ends',type:'warning'},
+  {month:'Jun',day:8,name:"King's Birthday (VIC) + Exam period begins",type:'danger'},
+  {month:'Jun',day:27,name:'Semester 1 Exams end',type:'danger'},
+  {month:'Jul',day:27,name:'Semester 2 Teaching Period begins',type:'good'},
+  {month:'Sep',day:28,name:'Semester 2 Mid-Semester Break begins',type:'break'},
+  {month:'Oct',day:23,name:'Semester 2 Teaching ends',type:'info'},
+  {month:'Nov',day:3,name:'Melbourne Cup Day — University closed',type:'break'},
+];
+const SEM1_WEEKS=[
+  {label:'W1 Mar 2',load:10,type:'normal',note:''},
+  {label:'W2 Mar 9',load:15,type:'normal',note:''},
+  {label:'W3 Mar 16',load:20,type:'normal',note:'Labour Day Mon'},
+  {label:'W4 Mar 23',load:38,type:'moderate',note:'Census Mar 31'},
+  {label:'MID Apr 6',load:5,type:'break',note:'Easter + Mid-Sem Break'},
+  {label:'W6 Apr 13',load:28,type:'normal',note:'Post-break catch-up'},
+  {label:'W7 Apr 22',load:42,type:'moderate',note:'ANZAC Day Fri'},
+  {label:'W8 Apr 28',load:52,type:'moderate',note:'Group deadlines cluster'},
+  {label:'W9 May 5',load:68,type:'danger',note:'Assignments + presentations'},
+  {label:'W10 May 12',load:88,type:'danger',note:'⚠ Peak crunch'},
+  {label:'W11 May 19',load:62,type:'moderate',note:'Final submissions begin'},
+  {label:'W12 May 26',load:78,type:'danger',note:'Last teaching week'},
+  {label:'SWOT Jun 1',load:40,type:'exam',note:'Revision only'},
+  {label:'EXAM Jun 8',load:55,type:'exam',note:"King's Birthday Mon"},
+];
+
+let assignments=JSON.parse(localStorage.getItem('am_assignments')||'[]');
+let calY=2026,calM=4;
+
+function save(){localStorage.setItem('am_assignments',JSON.stringify(assignments))}
+
+/* ═══════════════ NAV ═══════════════ */
+function showPage(id,tabEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(tabEl)tabEl.classList.add('active');
+  else{const idx=['dashboard','add','calendar','predict','estimator','persona'].indexOf(id);if(idx>=0)document.querySelectorAll('.nav-tab')[idx]?.classList.add('active')}
+  if(id==='dashboard')renderDashboard();
+  if(id==='predict')renderPredictPage();
+  if(id==='calendar')renderCalendar();
+  if(id==='estimator')initEstimator();
+  if(id==='persona')renderPersonaPage();
+}
+
+/* ═══════════════ DASHBOARD ═══════════════ */
+function renderDashboard(){
+  const now=new Date();
+  const wkEnd=new Date(now.getTime()+7*864e5);
+  const due=assignments.filter(a=>!a.done&&new Date(a.dueDate)>=now&&new Date(a.dueDate)<=wkEnd).length;
+  const hrs=assignments.reduce((s,a)=>s+(a.estimatedHours||0),0);
+  const done=assignments.filter(a=>a.done).length;
+  document.getElementById('stat-due').textContent=due;
+  document.getElementById('stat-hours').textContent=Math.round(hrs)+'h';
+  document.getElementById('stat-total').textContent=assignments.length;
+  document.getElementById('stat-done').textContent=done;
+  const wk=getSemWk(now);
+  document.getElementById('hero-sub').textContent=wk>0?`Semester 1, Week ${wk} of 12. ${assignments.length-done} assignments remaining.`:'Semester 1 has ended. Semester 2 begins 27 July 2026.';
+  renderUpcoming();renderHeatmap();renderAlerts();
+}
+
+function renderUpcoming(){
+  const el=document.getElementById('upcoming-list');
+  const now=new Date();
+  const sorted=[...assignments].filter(a=>!a.done).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate)).slice(0,6);
+  if(!sorted.length){el.innerHTML=`<div class="empty-state"><i class="ti ti-clipboard-list"></i><p>No upcoming assignments. Add your first one!</p></div>`;return}
+  el.innerHTML=sorted.map(a=>{
+    const due=new Date(a.dueDate);const days=Math.ceil((due-now)/864e5);
+    const u=days<=3?'high':days<=7?'med':'low';
+    return`<div class="assignment-row" onclick="toggleDone('${a.id}')">
+      <div class="assignment-dot dot-${u}"></div>
+      <div class="assignment-info"><div class="assignment-name">${a.unit||'Untitled'}</div>
+      <div class="assignment-meta"><span>${a.type||'—'}</span> · <span>${a.collab||'Individual'}</span> · <span>${fmtDate(due)}</span></div></div>
+      <span class="badge badge-${u}">${days<0?'Overdue':days===0?'Today!':days+'d'}</span></div>`;
+  }).join('');
+}
+
+function renderHeatmap(){
+  const el=document.getElementById('heatmap-grid');
+  const rows=[SEM1_WEEKS.slice(0,7),SEM1_WEEKS.slice(7,14)];
+  el.innerHTML=rows.map(row=>`<div class="week-grid">${row.map(w=>{
+    const cls=w.type==='danger'?'danger':w.type==='moderate'?'warning':w.type==='break'||w.type==='exam'?'break':'';
+    return`<div class="week-cell ${cls}" title="${w.note}">${w.label.split(' ')[0]}</div>`;
+  }).join('')}</div>`).join('');
+}
+
+function renderAlerts(){
+  const el=document.getElementById('alerts-list');const now=new Date();const alerts=[];
+  const wk=getSemWk(now);
+  if(wk>=9&&wk<=12)alerts.push({type:'danger',icon:'ti-flame',title:'Burnout Alert — Final Semester Crunch',body:'Weeks 9–12 carry the heaviest assessment load. Watch for group + individual deadline overlaps.'});
+  if(wk>=10&&wk<=12)alerts.push({type:'danger',icon:'ti-moon',title:'Sleep Warning — High Risk Period',body:'Plan 30-min breaks every 90 minutes. Monash data shows burnout peaks in Weeks 10–12.'});
+  const soon=assignments.filter(a=>{if(a.done)return false;const d=new Date(a.dueDate);const dy=Math.ceil((d-now)/864e5);return dy>=0&&dy<=5});
+  if(soon.length)alerts.push({type:'danger',icon:'ti-bell',title:`${soon.length} assignment${soon.length>1?'s':''} due within 5 days`,body:soon.map(a=>a.unit||'Untitled').join(' · ')});
+  const grp=assignments.filter(a=>a.collab&&a.collab.includes('Group')&&!a.done);
+  if(grp.length>=2)alerts.push({type:'warning',icon:'ti-users',title:'Group Assignment Overlap Detected',body:`${grp.length} active group assignments. Coordinate with teams early.`});
+  alerts.push({type:'success',icon:'ti-calendar-event',title:'Mid-Semester Break — Apr 6–10',body:'No scheduled classes. Your key reset window — use it for drafts, research, or rest.'});
+  alerts.push({type:'info',icon:'ti-school',title:'Swot Vac: Jun 1–5 · Exams: Jun 8–27',body:"King's Birthday (VIC) is Jun 8 — same day exams begin. Plan accordingly."});
+  el.innerHTML=alerts.map(a=>`<div class="alert-box alert-${a.type}"><i class="ti ${a.icon} alert-icon"></i><div class="alert-text"><strong>${a.title}</strong><span>${a.body}</span></div></div>`).join('');
+}
+
+/* ═══════════════ ADD ASSIGNMENT ═══════════════ */
+function toggleSingle(el,gid){document.getElementById(gid).querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected')}
+function getSelected(gid){const s=document.getElementById(gid).querySelector('.chip.selected');return s?(s.dataset.type||s.textContent.trim()):null}
+function estimateHours(type,words,diff,procr){
+  let base;
+  if(type==='Coding Project')base=12+words/600;
+  else if(type==='Design Project')base=10+words/400;
+  else if(type==='Video'||type==='Video Production')base=6+words/250;
+  else if(type==='Portfolio')base=14+words/350;
+  else if(type==='Online Quiz')base=2+words/1000;
+  else if(type==='Data Analysis')base=10+words/500;
+  else base=(words||1000)/({Essay:300,Report:260,Presentation:200,'Lab Report':280,'Case Study':260,'Literature Review':250,Reflection:320,Exam:150}[type]||270);
+  return Math.round(base*parseFloat(diff)*(1+(procr-1)*0.22));
+}
+function addAssignment(){
+  const unit=document.getElementById('unit-name').value.trim();
+  const dueDate=document.getElementById('due-date').value;
+  const type=getSelected('type-chips');
+  const collab=getSelected('collab-chips');
+  const words=parseInt(document.getElementById('word-count').value)||1500;
+  const diff=document.getElementById('difficulty').value;
+  const weight=document.getElementById('weighting').value;
+  const notes=document.getElementById('notes').value;
+  if(!dueDate){alert('Please set a due date.');return}
+  const procr=3;
+  const hrs=estimateHours(type,words,diff,procr);
+  const due=new Date(dueDate);
+  const startDate=new Date(due.getTime()-Math.round(hrs/2.5)*864e5);
+  const panicDate=new Date(due.getTime()-Math.round(hrs/2.5*0.35)*864e5);
+  const a={id:Date.now().toString(),unit,dueDate,type:type||'Essay',collab:collab||'Individual',words,diff,weight,notes,estimatedHours:hrs,startDate:startDate.toISOString().slice(0,10),panicDate:panicDate.toISOString().slice(0,10),done:false,created:new Date().toISOString()};
+  assignments.push(a);save();
+  const urgDays=Math.ceil((due-new Date())/864e5);
+  const uC=urgDays<=3?'danger':urgDays<=7?'warning':'success';
+  const wk=getSemWk(due);
+  document.getElementById('impact-preview').innerHTML=`
+    <div class="alert-box alert-${uC}" style="margin-bottom:14px"><i class="ti ti-chart-bar alert-icon"></i>
+      <div class="alert-text"><strong>Workload impact: +${hrs}h to Week ${wk||'—'}</strong><span>${hrs>40?'⚠ This pushes that week into High Risk territory.':'Manageable if you start on time.'}</span></div></div>
+    <div class="estimator-result">
+      <div class="est-num">${hrs}h</div><div class="est-unit">estimated actual hours needed</div>
+      <div class="est-row"><span class="est-key">Recommended start</span><span class="est-val">${fmtDate(startDate)}</span></div>
+      <div class="est-row"><span class="est-key">Due date</span><span class="est-val">${fmtDate(due)}</span></div>
+      <div class="est-row"><span class="est-key">Panic threshold</span><span class="est-val" style="color:#ffb3a8">${fmtDate(panicDate)}</span></div>
+    </div>
+    <div class="alert-box alert-success" style="margin-top:14px"><i class="ti ti-check alert-icon"></i>
+      <div class="alert-text"><strong>${unit||'Assignment'} added successfully</strong><span>Burnout predictions and alerts updated.</span></div></div>`;
+  renderAllList();renderDashboard();
+}
+function renderAllList(){
+  const el=document.getElementById('all-assignments-list');
+  if(!assignments.length){el.innerHTML='<p class="text-muted" style="padding:12px 0">No assignments added yet.</p>';return}
+  const sorted=[...assignments].sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  el.innerHTML=sorted.map(a=>{
+    const due=new Date(a.dueDate);const days=Math.ceil((due-new Date())/864e5);
+    const u=a.done?'low':days<=3?'high':days<=7?'med':'low';
+    return`<div class="assignment-row" style="${a.done?'opacity:.5;text-decoration:line-through':''}">
+      <div class="assignment-dot dot-${u}"></div>
+      <div class="assignment-info"><div class="assignment-name">${a.unit||'Untitled'}</div>
+      <div class="assignment-meta"><span>${a.type}</span> · <span>${fmtDate(due)}</span> · <span>${a.estimatedHours}h est.</span></div></div>
+      <button class="delete-btn" onclick="delAssignment('${a.id}',event)"><i class="ti ti-trash"></i></button></div>`;
+  }).join('');
+}
+function delAssignment(id,e){e.stopPropagation();assignments=assignments.filter(a=>a.id!==id);save();renderAllList();renderDashboard()}
+function toggleDone(id){const a=assignments.find(x=>x.id===id);if(a){a.done=!a.done;save();renderDashboard()}}
+
+/* ═══════════════ CALENDAR ═══════════════ */
+function changeMonth(d){calM+=d;if(calM<0){calM=11;calY--}if(calM>11){calM=0;calY++}renderCalendar()}
+function renderCalendar(){
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent=`${months[calM]} ${calY}`;
+  const first=new Date(calY,calM,1),last=new Date(calY,calM+1,0),today=new Date();
+  let dow=first.getDay()-1;if(dow<0)dow=6;
+  const dueDates=new Set(assignments.map(a=>a.dueDate));
+  let cells='';
+  for(let i=0;i<dow;i++)cells+='<div class="cal-day empty"></div>';
+  for(let d=1;d<=last.getDate();d++){
+    const date=new Date(calY,calM,d);
+    const ds=date.toISOString().slice(0,10);
+    const isToday=date.toDateString()===today.toDateString();
+    const hasTask=dueDates.has(ds);
+    const isBreak=inRange(date,M26.midBreak.start,M26.midBreak.end)||inRange(date,M26.sem2Mid.start,M26.sem2Mid.end);
+    const isExam=inRange(date,M26.swotVac.start,M26.swotVac.end)||inRange(date,M26.exams.start,M26.exams.end);
+    const hol=M26.hols.find(h=>h.date.toDateString()===date.toDateString());
+    let cls='cal-day';
+    if(isToday)cls+=' today';if(hasTask)cls+=' has-task';if(isBreak)cls+=' break-day';if(isExam)cls+=' exam-week';if(hol&&!isToday)cls+=' holiday';
+    cells+=`<div class="${cls}" title="${hol?hol.name:''}">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=cells;
+  const colors={info:'var(--lav)',good:'var(--g2)',danger:'var(--coral)',warning:'var(--amber)',break:'var(--ink-light)'};
+  document.getElementById('key-dates-list').innerHTML=KEY_DATES.map(kd=>`
+    <li class="event-item">
+      <div class="event-date-wrap"><div class="event-date" style="color:${colors[kd.type]}">${kd.day}</div><div class="event-month">${kd.month}</div></div>
+      <div class="event-info"><div class="event-name">${kd.name}</div></div>
+      <span class="badge badge-${kd.type==='good'?'low':kd.type==='info'?'info':kd.type==='break'?'info':'high'}" style="flex-shrink:0;font-size:10px">${kd.type.toUpperCase()}</span>
+    </li>`).join('');
+}
+
+/* ═══════════════ BURNOUT PREDICT ═══════════════ */
+function renderPredictPage(){
+  const weekLoads=SEM1_WEEKS.map(w=>({...w}));
+  assignments.forEach(a=>{if(a.done)return;const wk=getSemWk(new Date(a.dueDate));if(wk>0&&wk<=12)weekLoads[wk-1].load=Math.min(100,weekLoads[wk-1].load+(a.estimatedHours||0)/2)});
+  document.getElementById('week-bars-container').innerHTML=weekLoads.map(w=>{
+    const pct=Math.min(100,Math.round(w.load));
+    const color=w.type==='danger'?'var(--coral)':w.type==='moderate'?'var(--amber)':w.type==='break'||w.type==='exam'?'var(--lav)':'var(--g3)';
+    const badge=w.type==='danger'?'<span class="badge badge-high" style="font-size:10px">High Risk</span>':w.type==='exam'?'<span class="badge badge-info" style="font-size:10px">Exam</span>':w.type==='break'?'<span class="badge badge-info" style="font-size:10px">Break</span>':w.type==='moderate'?'<span class="badge badge-med" style="font-size:10px">Moderate</span>':'';
+    return`<div class="week-bar-wrap">
+      <div class="week-label"><span style="display:flex;align-items:center;gap:8px">${w.label} ${badge} <span class="text-muted">${w.note}</span></span><span class="text-muted">${pct}h predicted</span></div>
+      <div class="week-bar-bg"><div class="week-bar-fill" style="width:${pct}%;background:${color}"></div></div></div>`;
+  }).join('');
+  document.getElementById('high-risk-list').innerHTML=`
+    <div class="alert-box alert-danger"><i class="ti ti-flame alert-icon"></i><div class="alert-text"><strong>Week 10 — High Risk Week (May 12–18)</strong><span>Peak load — group + individual deadlines overlap. Start group work by Week 7.</span></div></div>
+    <div class="alert-box alert-danger"><i class="ti ti-brain alert-icon"></i><div class="alert-text"><strong>Week 12 — Burnout Alert (May 26–29)</strong><span>Final crunch + Swot Vac immediately follows. Exam prep window is shorter than expected.</span></div></div>
+    <div class="alert-box alert-warning"><i class="ti ti-moon alert-icon"></i><div class="alert-text"><strong>Week 9 — Sleep Warning (May 5–11)</strong><span>Multi-deadline convergence. High-procrastination profiles risk 4–5 nights under 5h sleep.</span></div></div>`;
+  document.getElementById('recovery-list').innerHTML=`
+    <div class="alert-box alert-success"><i class="ti ti-leaf alert-icon"></i><div class="alert-text"><strong>Mid-Semester Break — Apr 6–10</strong><span>Best reset window. Use for drafts, reading, group meetings. Easter Monday is a public holiday.</span></div></div>
+    <div class="alert-box alert-success"><i class="ti ti-sun alert-icon"></i><div class="alert-text"><strong>Weeks 1–3 (Mar 2–20) — Light Load</strong><span>No major deadlines. Invest early: read Week 1, draft outlines, form study groups.</span></div></div>
+    <div class="alert-box alert-info"><i class="ti ti-calendar-event alert-icon"></i><div class="alert-text"><strong>ANZAC Day — Fri Apr 25</strong><span>Public holiday. Good opportunity for extended study without lecture interruptions.</span></div></div>`;
+  document.getElementById('insights-list').innerHTML=`
+    <div class="grid-2">
+      <div class="alert-box alert-warning" style="margin-bottom:0"><i class="ti ti-chart-line alert-icon"></i><div class="alert-text"><strong>Group assignment timing risk</strong><span>Group projects assigned in Weeks 2–3 typically deadline in Weeks 9–11, overlapping with individual assessments. Groups that meet before Week 5 score significantly higher.</span></div></div>
+      <div class="alert-box alert-info" style="margin-bottom:0"><i class="ti ti-clock alert-icon"></i><div class="alert-text"><strong>Census date psychological effect</strong><span>Many students defer starting until after Census Date (Mar 31), compressing the effective study period from 12 to ~8 weeks. Starting Week 1 is your biggest academic advantage.</span></div></div>
+    </div>`;
+}
+
+/* ═══════════════ TIME ESTIMATOR ═══════════════ */
+const procrL=['','Level 1 — I am a machine (unlikely)','Level 2 — I usually start a week early','Level 3 — I\'ll start after one more episode','Level 4 — I said I\'ll do it tomorrow… last week','Level 5 — What submission portal? (danger zone)'];
+function updateProcr(){document.getElementById('est-procr-out').textContent=procrL[parseInt(document.getElementById('est-procr').value)]}
+function updateEstLabel(iid,oid,fmt){document.getElementById(oid).textContent=fmt(parseFloat(document.getElementById(iid).value))}
+function initEstimator(){
+  updateEstLabel('est-words','est-words-out',v=>Math.round(v).toLocaleString()+' words');
+  updateEstLabel('est-daily','est-daily-out',v=>v+' hours/day');updateProcr();
+  if(!document.getElementById('est-due').value){document.getElementById('est-due').value=new Date(Date.now()+14*864e5).toISOString().slice(0,10)}
+  calcEstimate();
+}
+function calcEstimate(){
+  const type=document.getElementById('est-type')?.value;if(!type)return;
+  const words=parseFloat(document.getElementById('est-words')?.value)||2000;
+  const diff=parseFloat(document.getElementById('est-diff')?.value)||1;
+  const procr=parseInt(document.getElementById('est-procr')?.value)||3;
+  const daily=parseFloat(document.getElementById('est-daily')?.value)||3;
+  const dueEl=document.getElementById('est-due');
+  const actual=estimateHours(type,words,diff,procr);
+  const daysNeeded=Math.ceil(actual/daily);
+  let dueStr='Not set',startStr='—',panicStr='—',daysLeft=null;
+  if(dueEl?.value){
+    const due=new Date(dueEl.value);const now=new Date();
+    daysLeft=Math.ceil((due-now)/864e5);
+    startStr=fmtDate(new Date(due.getTime()-daysNeeded*864e5));
+    panicStr=fmtDate(new Date(due.getTime()-Math.round(daysNeeded*.35)*864e5));
+    dueStr=fmtDate(due);
+  }
+  const rC=procr>=4?'var(--coral)':procr>=3?'var(--amber)':'var(--g3)';
+  const rL=procr>=4?'High':procr>=3?'Moderate':'Low';
+  const urgent=daysLeft!==null&&daysLeft<daysNeeded;
+  document.getElementById('estimate-result').innerHTML=`
+    <div class="estimator-result">
+      <div class="est-num">${actual}h</div><div class="est-unit">realistic hours needed</div>
+      <div class="est-row"><span class="est-key">Days needed (${daily}h/day)</span><span class="est-val">${daysNeeded} days</span></div>
+      <div class="est-row"><span class="est-key">Recommended start</span><span class="est-val">${startStr}</span></div>
+      <div class="est-row"><span class="est-key">Due date</span><span class="est-val">${dueStr}</span></div>
+      <div class="est-row"><span class="est-key">Panic threshold</span><span class="est-val" style="color:#ffb3a8">${panicStr}</span></div>
+      <div class="est-row"><span class="est-key">Burnout risk</span><span class="est-val" style="color:${rC}">${rL}</span></div>
+      ${urgent?`<div style="background:rgba(224,92,75,0.25);border-radius:8px;padding:8px 12px;margin-top:12px;font-size:12px;color:#ffb3a8">⚠ You should have started already. Enter recovery mode.</div>`:''}
+    </div>
+    <p class="text-muted" style="margin-top:10px;font-size:11px">Difficulty ×${diff} · Procrastination ×${(1+(procr-1)*.22).toFixed(2)}</p>`;
+}
+
+/* ═══════════════ PERSONAS ═══════════════ */
+const PERSONAS=[
+  {id:'panic',emoji:'😰',name:'Panic Worker',desc:'Thrives on adrenaline. Best work at 2am the night before.',type:'danger',
+  advice:`<div class="alert-box alert-danger" style="margin-bottom:14px"><i class="ti ti-flame alert-icon"></i><div class="alert-text"><strong>High burnout risk · Adrenaline-dependent workflow</strong><span>You work best under pressure but crash hard after Week 10. Your body keeps score.</span></div></div><p style="margin-bottom:12px;font-size:13px;color:var(--ink-mid)"><strong>AssignMate adjusts for you:</strong> Sets T-minus 72h "last chance" alerts · Blocks Swot Vac for exams only · Adds 40% more hours than optimistic estimates · Schedules mandatory 2-day buffer before every deadline.</p><div class="alert-box alert-warning"><i class="ti ti-lightbulb alert-icon"></i><div class="alert-text"><strong>Recovery Mode tip</strong><span>After Week 10 crunch, block Monday–Tuesday of Week 11 as a no-assignment recovery window. Your marks don't improve in the last 3 hours before submission.</span></div></div>`},
+  {id:'overplanner',emoji:'📋',name:'Chronic Overplanner',desc:'Plans every hour. Redoes the Gantt chart. Starts actual work in Week 9.',type:'warning',
+  advice:`<div class="alert-box alert-warning" style="margin-bottom:14px"><i class="ti ti-clipboard-list alert-icon"></i><div class="alert-text"><strong>Planning paralysis risk · Execution gap detected</strong><span>Your plan is perfect. Unfortunately the assignment is due in 3 days and you're still on the colour-coding phase.</span></div></div><p style="margin-bottom:12px;font-size:13px;color:var(--ink-mid)"><strong>AssignMate adjusts for you:</strong> "Stop planning, start writing" nudges every 3 days · Non-negotiable 30-min daily draft sessions · Celebrates first drafts, not final versions.</p><div class="alert-box alert-success"><i class="ti ti-check alert-icon"></i><div class="alert-text"><strong>Your superpower</strong><span>Your structure means you never miss a deadline. Channel that planning energy into starting 2 weeks earlier than you think you need to.</span></div></div>`},
+  {id:'genius',emoji:'⚡',name:'Last-Minute Genius',desc:'Submits 3 minutes before cutoff and somehow gets a Distinction.',type:'danger',
+  advice:`<div class="alert-box alert-warning" style="margin-bottom:14px"><i class="ti ti-bolt alert-icon"></i><div class="alert-text"><strong>High variance output · Sleep debt accumulator · Group liability risk</strong><span>You pull it off solo, but group assignments with a Last-Minute Genius are everyone else's nightmare.</span></div></div><p style="margin-bottom:12px;font-size:13px;color:var(--ink-mid)"><strong>AssignMate adjusts for you:</strong> Compresses task views to 3-day windows · Sleep warnings during Weeks 9–12 · Flags group assignments where your pattern affects teammates.</p><div class="alert-box alert-info"><i class="ti ti-users alert-icon"></i><div class="alert-text"><strong>Group work warning</strong><span>Monash peer evaluations can adjust individual marks by ±15%. Your teammates remember Week 11.</span></div></div>`},
+  {id:'perfectionist',emoji:'🔥',name:'Burnout Perfectionist',desc:'References 47 papers. Loses sleep over rubric wording. WAM anxiety is real.',type:'danger',
+  advice:`<div class="alert-box alert-danger" style="margin-bottom:14px"><i class="ti ti-heart-broken alert-icon"></i><div class="alert-text"><strong>Burnout risk: Critical · Overinvestment pattern</strong><span>You start early but cannot stop editing. Week 12 is your personal breakdown zone without intervention.</span></div></div><p style="margin-bottom:12px;font-size:13px;color:var(--ink-mid)"><strong>AssignMate adjusts for you:</strong> "Good enough" submission gates 48h before deadline · Enforces mid-semester break (no work Fri–Sun) · Alerts at 50+ weekly hours.</p><div class="alert-box alert-warning"><i class="ti ti-scale alert-icon"></i><div class="alert-text"><strong>WAM perspective</strong><span>A 78 submitted on time beats an 85 submitted exhausted and late. H2A is genuinely strong. You do not need a HD in every unit.</span></div></div>`},
+  {id:'achiever',emoji:'🌿',name:'Quiet Achiever',desc:'Consistently above average. Secretly has everything under control. No drama.',type:'success',
+  advice:`<div class="alert-box alert-success" style="margin-bottom:14px"><i class="ti ti-leaf alert-icon"></i><div class="alert-text"><strong>Low burnout risk · Consistent output · You're doing fine</strong><span>You don't make a fuss, you just do the work. Everyone else in your group wishes they were you.</span></div></div><p style="margin-bottom:12px;font-size:13px;color:var(--ink-mid)"><strong>AssignMate adjusts for you:</strong> Clean weekly summaries · Highlights opportunities to push WAM during light weeks · Stretch reading in Weeks 1–3.</p><div class="alert-box alert-info"><i class="ti ti-trending-up alert-icon"></i><div class="alert-text"><strong>Growth opportunity</strong><span>Your consistency is your foundation. Use light weeks (1–3) to aim above your usual grade — you have the bandwidth most students don't.</span></div></div>`},
+  {id:'ghost',emoji:'👻',name:'Ghost Student',desc:'Attended Week 1, Week 6, and the final exam. No one knows your name.',type:'danger',
+  advice:`<div class="alert-box alert-danger" style="margin-bottom:14px"><i class="ti ti-ghost alert-icon"></i><div class="alert-text"><strong>Attendance risk · Census date vulnerability · Fail-risk on participation marks</strong><span>You've technically not withdrawn from 2 units. The census date has passed. That's a tuition liability.</span></div></div><p style="margin-bottom:12px;font-size:13px;color:var(--ink-mid)"><strong>AssignMate adjusts for you:</strong> Census date reminders 3 weeks early · Flags units with >20% participation weighting · Shows minimum viable assignment list to pass.</p><div class="alert-box alert-warning"><i class="ti ti-alert-triangle alert-icon"></i><div class="alert-text"><strong>Monash attendance note</strong><span>Tutorial participation grades and in-class assessments can catch Ghost Students by Week 8. Check your unit guides now.</span></div></div>`},
+  {id:'groupmaster',emoji:'🎭',name:'Group Project Director',desc:'Does the entire assignment themselves. Adds everyone's name. Seething quietly.',type:'warning',
+  advice:`<div class="alert-box alert-warning" style="margin-bottom:14px"><i class="ti ti-users alert-icon"></i><div class="alert-text"><strong>Overload risk · Resentment accumulation · Control pattern</strong><span>You'll do it all again. You'll tell no one how long it took. Your group will get the same mark as you.</span></div></div><p style="margin-bottom:12px;font-size:13px;color:var(--ink-mid)"><strong>AssignMate adjusts for you:</strong> +35% hours to all group assignments · Delegation check-ins at Week 2 of each project · Peer evaluation conversation scripts.</p><div class="alert-box alert-info"><i class="ti ti-message-circle alert-icon"></i><div class="alert-text"><strong>Peer evaluation reminder</strong><span>Monash peer evaluations can adjust individual marks by ±15%. Document contributions from Week 1 group meetings.</span></div></div>`},
+  {id:'napper',emoji:'😴',name:'Strategic Napper',desc:'Prioritises sleep and wellbeing. Barely passes but is the healthiest in the cohort.',type:'success',
+  advice:`<div class="alert-box alert-success" style="margin-bottom:14px"><i class="ti ti-moon alert-icon"></i><div class="alert-text"><strong>Low stress · Healthy priorities · Occasionally fails things</strong><span>You are the most mentally healthy person in your cohort. Some assignments are not submitted.</span></div></div><p style="margin-bottom:12px;font-size:13px;color:var(--ink-mid)"><strong>AssignMate adjusts for you:</strong> Protects 8-hour sleep windows · Minimum-viable study plans · Flags which assignments actually move the WAM needle.</p><div class="alert-box alert-warning"><i class="ti ti-scale alert-icon"></i><div class="alert-text"><strong>Balance calibration</strong><span>Passing all units matters for graduation eligibility. Check your WAM trajectory at the mid-semester break.</span></div></div>`},
+  {id:'sprinter',emoji:'🏃',name:'Semester Sprinter',desc:'Weeks 1–9 are basically a gap year. Weeks 10–12 are a horror story.',type:'danger',
+  advice:`<div class="alert-box alert-danger" style="margin-bottom:14px"><i class="ti ti-run alert-icon"></i><div class="alert-text"><strong>Extreme burnout risk · Semester-end collapse pattern</strong><span>Week 10 you have 6 assignments due that you haven't started. Week 12 you stop sleeping.</span></div></div><p style="margin-bottom:12px;font-size:13px;color:var(--ink-mid)"><strong>AssignMate adjusts for you:</strong> Locks Weeks 1–3 for mandatory research setup · Aggressive early draft deadlines · Mandatory Week 9 status check-in · Shows cumulative stress curve.</p><div class="alert-box alert-warning"><i class="ti ti-chart-line alert-icon"></i><div class="alert-text"><strong>The math of procrastination</strong><span>12 weeks at 3h/day = 252 hours. 3 weeks at 12h/day = 252 hours. Same output. One version involves sleep.</span></div></div>`},
+];
+let selectedPersona=null;
+function renderPersonaPage(){
+  document.getElementById('persona-grid').innerHTML=PERSONAS.map(p=>`
+    <div class="persona-card ${selectedPersona===p.id?'active':''}" onclick="selectPersona('${p.id}')">
+      <span class="persona-emoji">${p.emoji}</span>
+      <div class="persona-name">${p.name}</div>
+      <div class="persona-desc">${p.desc}</div>
+    </div>`).join('');
+}
+function selectPersona(id){
+  selectedPersona=id;renderPersonaPage();
+  const p=PERSONAS.find(x=>x.id===id);if(!p)return;
+  document.getElementById('advice-title').textContent=`${p.emoji} ${p.name} — Personalised strategy`;
+  document.getElementById('advice-body').innerHTML=p.advice;
+}
+
+/* ═══════════════ UTILS ═══════════════ */
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}
+function inRange(d,s,e){return d>=s&&d<=e}
+function getSemWk(date){const ms=date-M26.sem1Start;if(ms<0)return 0;const w=Math.ceil(ms/(7*864e5));return w>12?0:w}
+
+/* ═══════════════ INIT ═══════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  renderDashboard();renderAllList();
+  document.getElementById('due-date').value=new Date(Date.now()+14*864e5).toISOString().slice(0,10);
+  calM=new Date().getMonth();calY=new Date().getFullYear();
+});
+</script>
+</body>
+</html>
